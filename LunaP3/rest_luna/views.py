@@ -25,3 +25,30 @@ def lista_producto(request):
             return Response(serializer.data, status= status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
+
+#indicamos el apiview, de GET, PUT y DELETE
+@api_view(['GET', 'PUT', 'DELETE'])
+#funcion detalle producto  metodos GET, PUT y DELETE
+def detalle_producto(request, id):
+    try:
+        #en este bloque try,  el id será el sku del producto
+        # el cual lo busca en la base de datos, si existe lo asignaremos
+        #a la variable v_producto
+        v_producto = Producto.objects.get(sku=id)
+    except Producto.DoesNotExist:
+        #si no existe, devolveremos un 404
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        serializer = ProductoSerializer(v_producto)
+        return Response(serializer.data)
+    if request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = ProductoSerializer(v_producto, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        v_producto.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
