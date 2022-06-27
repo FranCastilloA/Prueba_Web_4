@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+
+    <!-- Cargamos static-->
+    {% load static %}
+
+    <!-- CSS Custom-->
+    <link rel="stylesheet" href="{% static 'core/css/index.css' %}" ></link>
+
+    <link rel="icon" href="{% static 'core/img/logoIcono.ico' %}">
+
+
+    <title>Luna Peluda</title>
+
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+
+    
+<script type="text/javascript">
+    $(document).ready(function(){
+        
+        $("#error").hide();
+        $("#nice").hide();
+        // Funcion para generar el Capcha
+            // tomada y adaptada del siguiente link http://jquery-manual.blogspot.com/2013/09/generar-codigo-aleatorio-partir-de.html
+            function rand_code(chars, lon){
+                    code = "";
+                    for (x=0; x < lon; x++)
+                    {
+                    rand = Math.floor(Math.random()*chars.length);
+                    code += chars.substr(rand, 1);
+                    }
+                    return code;
+                }
+                // Declaramos una cadena de caracteres    
+                var    caracteres = "0123456789abcdefABCDEF?¿¡!:;";
+                var    longitud = 5;
+                //llamamos la funcion y luego llenamos el textbox
+                var captcha = rand_code(caracteres,longitud);
+                $("#captcha1").val(captcha);
+            
+            // Habilitamos un boton para generar nuevos capcha en caso que el generado sea muy complejo.
+            $("#captcha").click(function(){
+                
+                var captcha = rand_code(caracteres,longitud);
+
+                $("#captcha1").val(captcha);
+            });
+
+        $("#formulario").submit(function(){
+
+            var mensaje ="";
+                        
+            // Calcular Dígito Verificador en base al Módulo 11 (rut en formato 12345678-9)
+                rut = $("#rut").val().slice(0,-1);
+                dv = $("#rut").val().slice(-1);
+
+                suma = 0;
+                multiplo = 2;
+        
+                for(i=1;i<=$("#rut").val().length;i++) {
+        
+                    index = multiplo * rut.charAt(rut.length - i);
+                    suma = suma + index;
+            
+                    if(multiplo < 7) { 
+                        multiplo = multiplo + 1; } 
+                    else { 
+                        multiplo = 2; 
+                    }
+                }
+        
+                dvCorrecto = 11 - (suma % 11);
+                
+                // Casos Especiales (0 y K)
+                
+                if (dv == 'K'){ dv=10};
+                if (dv == '0'){ dv=11};
+                
+                // Validar que el Cuerpo coincide con su Dígito Verificador
+                if(dvCorrecto != dv) { 
+                    mensaje = "El rut es incorrecto";    
+                }
+            
+                //Comprobamos que las contraseñas sean iguales.
+            if($("#password1").val()!=$("#password2").val()){
+                mensaje = "Las contraseñas no coinciden";
+            }
+            //Comprobamos el largo minimo de la contraseña.
+            if($("#password1").val().trim().length<5){
+                mensaje = "La contraseña es muy corta";
+            }
+            //Comprobamos que hayan numeros en la contraseña.
+            bandera = true;
+            for(i=1;i<=$("#password1").val().length;i++) {
+                if($("#password1").val().charAt(i)=='0'||$("#password1").val().charAt(i)=='1'||$("#password1").val().charAt(i)=='2'||$("#password1").val().charAt(i)=='3'||$("#password1").val().charAt(i)=='4'||$("#password1").val().charAt(i)=='5'||$("#password1").val().charAt(i)=='6'||$("#password1").val().charAt(i)=='7'||$("#password1").val().charAt(i)=='8'||$("#password1").val().charAt(i)=='9'){
+                    bandera = false;    
+                }
+            }
+            if (bandera){
+                mensaje = "La contraseña debe incluir al menos un numero";    
+            }
+            
+            //Comprobamos que el usuario haya replicado el captcha
+            if($("#captcha1").val()!=$("#captcha2").val()){
+                    mensaje = "Ingrese el captcha correctamente.";
+            } 
+
+
+
+
+
+            //Comprobamos que los campos no esten en blanco.
+            if($("#nombre").val().trim().length==0){
+                mensaje = "El nombre está en blanco";
+            }else if($("#rut").val().trim().length==0){
+                mensaje = "El rut está en blanco";
+            }else if($("#email").val().trim().length==0){
+                    mensaje = "El email esta en blanco";
+            }else if($("#password1").val().trim().length==0){
+                    mensaje = "La contraseña esta en blanco";
+            }else if($("#password2").val().trim().length==0){
+                    mensaje = "La contraseña esta en blanco";
+            }
+
+
+            if(mensaje !=""){
+                $("#error").html(mensaje);
+                $("#error").show();
+                event.preventDefault();
+            }else{
+                mensaje = "Registro Exitoso!";
+                $("#nice").html(mensaje);
+                $("#nice").show();
+            }
+        });
+    })
+</script>
+</head>
+<body>
+    
+    <div class="fondo-lateral ">    <!--   COLOR DE FONDO -->
+
+        <div class="container fondo-default">
+
+            <div class="row">   <!--navbar-->
+                <nav class="navbar navbar-expand-lg navbar-light borderNav ">
+                    <div class="container">
+                        <nav class="navbar navbar-light ">
+                            <div class="container">
+                              <a class="navbar-brand" href="index.html">
+                                <img src="{% static 'core/img/logo.png' %}" alt="" width="80" height="80">
+                                Luna Peluda
+                              </a>
+                            </div>
+                          </nav>
+                      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                      </button>
+                      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                          <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="index.html">Inicio</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="Nosotros.html">Nosotros</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="Tienda.html">Tienda</a>
+                          </li>
+                          <!-- <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              Productos
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                              <li><a class="dropdown-item" href="Catalogo.html">Catálogo</a></li>
+                            </ul>
+                          </li> -->
+                          <li class="nav-item">
+                            <a class="nav-link" href="Formulario.html">Registrarse</a>
+                          </li>
+                        </ul>
+                        <form class="d-flex">
+                          <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
+                          <button class="btn btn-outline-success" type="submit">Buscar</button>
+                        </form>
+                      </div>
+                    </div>
+                  </nav>
+
+            </div>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-4"></div>
+                        <h1>Formulario</h1>
+                        <div class="col-sm-4"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4"></div>
+                        <form method="post" action="" id="formulario">
+                            <div class="col">
+                            <div>
+                                <label for="nombre">Nombre: </label>
+                                <input type="text" class="form-control" id="nombre" name="nombre">
+                            </div><br>
+                            <div>
+                                <label for="rut">Rut( sin puntos ni guion): </label>
+                                <input type="text" class="form-control" id="rut" name="rut">
+                            </div><br>
+                            <div>
+                                <label for="email">Correo Electrónico: </label>
+                                <input type="email" class="form-control" id="email" name="email">
+                            </div><br>
+                            <div>
+                                <label for="comentarios">Comentarios: </label>
+                                <textarea class="form-control" placeholder="Agregue comentario aqui.." id="comentarios" style="height: 100px"></textarea>
+                            </div></div>
+                            <div class="col">
+                            <div>
+                                <label for="password">Contraseña: </label>
+                                <input type="password" class="form-control" id="password1" name="password1">
+                            </div><br>
+                            <div>
+                                <label for="password"> Confirme Contraseña: </label>
+                                <input type="password" class="form-control" id="password2" name="password2">
+                            </div><br>
+                            <div class="form-group">
+                                <label for="captcha1">Escriba el Captcha: </label>
+                                <input type="text user-select:none" class="form-control" id="captcha1" name="captcha1" disabled >
+                                <input type="text" class="form-control" id="captcha2" name="captcha2" >
+                                <button type="button" class="btn btn-primary" id="captcha">Generar Captcha</button>
+                            </div></div>
+                            <br>
+                            <input type="submit" class="btn btn-danger" id="enviar" value="Enviar">
+                            <input type="reset" class="btn btn-primary" id="limpiar" value="Limpiar">
+                            <div id="error" class="alert alert-danger" role="alert"></div>
+                            <div id="nice" class="alert alert-success" role="alert"></div>    
+                        </form>
+                        <div class="col-sm-4"></div>
+                    </div>
+                    
+                </div>
+            <div class="row">   <!--footer-->
+                <footer>
+                    <div class="container borderFooter">
+                        <div class="row">
+                            <div class="col-sm-6 col-md-3 item">
+                                <h3>De Utilidad</h3>
+                                <ul>
+                                    <li><a href="Nosotros.html#">Quienes Somos</a></li>
+                                    <li><a href="mailto:LunaPeluda@Gmail.com">Contáctanos</a></li>
+                                    <li><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Nuestro Youtube</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-6 col-md-3 item">
+                                <h3>Asociados</h3>
+                                <ul>
+                                    <li><a href="https://vinculohumanoanimal.cl/rescateyreubicaciondegatos/">Albergue de Gatos</a></li>
+                                    <li><a href="https://www.rescatefelinochile.cl/">Rescate Felino</a></li>
+                                    <li><a href="http://fundacioncbh.cl/">Fundación Callejeros</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6 item text">
+                                <h3>Luna Peluda</h3>
+                                <p>Somos un emprendimiento creado por amigas que buscan ayudar a los perritos y gatitos de la calle. Lo recaudado por tus compras irá en directo beneficio de albergues de adopción y acogida. No compres, adopta.</p>
+                            </div>
+                            <div class="col item social"><a href="#"><i class="icon ion-social-facebook"></i></a><a href="#"><i class="icon ion-social-twitter"></i></a><a href="#"><i class="icon ion-social-snapchat"></i></a><a href="#"><i class="icon ion-social-instagram"></i></a></div>
+                        </div>
+                        <p class="copyright">Luna Peluda © 2022. Telefono: +56 9 7141 9045. LunaPeluda@Gmail.com</p>
+                    </div>
+                </footer>
+
+            </div>
+        </div>
+    </div>        
+</body>
+</html>
