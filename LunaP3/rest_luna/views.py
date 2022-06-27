@@ -1,17 +1,28 @@
 #hay que importar lo basico primero
 from django.shortcuts import render
 from rest_framework import status
-from rest_framework.decorators import api_view
+#agregamos el permission classes
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from django.views.decorators.csrf import csrf_exempt
 #importamos el modelo desde core y el serializer que creamos
 from core.models import Producto
 from .serializers import ProductoSerializer
+#para resguardar la api importamos lo siguiente
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+
+
+
 # Agregamos lo siguiente que es para preparar el api local
 @csrf_exempt
 @api_view(['GET', 'POST'])
+#aplicamos el uso de permission classes y con ello autorizar cada funcion
+@permission_classes((IsAuthenticated,))
 #ahora creamos nuestro codigo
+#funcion lista producto metodos GET  y POST
 def lista_producto(request):
     if request.method == 'GET':
         producto = Producto.objects.all()
@@ -26,8 +37,12 @@ def lista_producto(request):
         else:
             return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
 
+
+
 #indicamos el apiview, de GET, PUT y DELETE
 @api_view(['GET', 'PUT', 'DELETE'])
+#aplicamos el uso de permission classes y con ello autorizar cada funcion
+@permission_classes((IsAuthenticated,))
 #funcion detalle producto  metodos GET, PUT y DELETE
 def detalle_producto(request, id):
     try:
